@@ -6,15 +6,15 @@ workflows:
     environment:
       vars:
         QT_VERSION: "6.6.0"
-        BUNDLE_ID: "com.mira.app.client" # هوية التطبيق
+        BUNDLE_ID: "com.mira.app.client"
       xcode: latest
     scripts:
       - name: Install Qt6 with all required modules
         script: |
           pip3 install aqtinstall
-          # إضافة shadertools و declarative و qt5compat لضمان وجود كل التبعيات
-          aqt install-qt mac desktop $QT_VERSION -m qt5compat shadertools declarative
-          aqt install-qt mac ios $QT_VERSION -m qt5compat shadertools declarative
+          # المسميات الصحيحة للموديولات في aqt هي qt5compat و qtshadertools
+          aqt install-qt mac desktop $QT_VERSION -m qt5compat qtshadertools
+          aqt install-qt mac ios $QT_VERSION -m qt5compat qtshadertools
       - name: Configure and Build MIRA_Client
         script: |
           QT_IOS="/Users/builder/clone/6.6.0/ios"
@@ -25,7 +25,7 @@ workflows:
           cd MIRA/client
           mkdir -p build && cd build
           
-          # تشغيل qt-cmake مع إضافة موديول ShaderTools وتعيين Bundle ID
+          # استخدام qt-cmake مع تمرير المتغيرات المطلوبة
           $QT_IOS/bin/qt-cmake .. \
             -G Xcode \
             -DQT_HOST_PATH=$QT_MAC \
