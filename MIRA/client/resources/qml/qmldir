@@ -1,0 +1,6 @@
+module MiraApp
+singleton Theme 1.0 Theme.qml
+singleton Loc 1.0 Loc.qml
+singleton UserStore 1.0 stores/UserStore.qml
+singleton FeedStore 1.0 stores/FeedStore.qml
+singleton SearchStore 1.0 stores/SearchStore.qml

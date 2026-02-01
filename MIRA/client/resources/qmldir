@@ -1,0 +1,8 @@
+singleton ThreadsConstants 1.0 ThreadsConstants.qml
+singleton ThreadsIcons 1.0 ThreadsIcons.qml
+ThreadsButton 1.0 ThreadsButton.qml
+ThreadsAvatar 1.0 ThreadsAvatar.qml
+ThreadsIcon 1.0 ThreadsIcon.qml
+ThreadsTabBar 1.0 ThreadsTabBar.qml
+ThreadsPostItem 1.0 ThreadsPostItem.qml
+ThreadsHomeView 1.0 views/ThreadsHomeView.qml

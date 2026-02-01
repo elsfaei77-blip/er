@@ -1,0 +1,3 @@
+C:/Users/S.F/Desktop/sd/MIRA/server/build/CMakeFiles/mira_server.dir
+C:/Users/S.F/Desktop/sd/MIRA/server/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/S.F/Desktop/sd/MIRA/server/build/CMakeFiles/ZERO_CHECK.dir

@@ -1,0 +1,22 @@
+{
+    "listeners": [
+        {
+            "address": "0.0.0.0",
+            "port": 8000,
+            "https": false
+        }
+    ],
+    "db_clients": [
+        {
+            "name": "default",
+            "rdbms": "sqlite3",
+            "filename": "mira.db",
+            "filename_extension": "sqlite3"
+        }
+    ],
+    "app": {
+        "number_of_threads": 1,
+        "enable_console_log": true,
+        "client_max_body_size": 104857600
+    }
+}

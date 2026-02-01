@@ -1,0 +1,10 @@
+^C:\USERS\S.F\DESKTOP\SD\MIRA\SERVER\BUILD\CMAKEFILES\4B20FEC6332F4823D31DEF77C2410B24\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/S.F/Desktop/sd/MIRA/server -BC:/Users/S.F/Desktop/sd/MIRA/server/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/S.F/Desktop/sd/MIRA/server/build/mira_server.slnx
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

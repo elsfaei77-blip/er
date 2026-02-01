@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\S.F\Desktop\sd\MIRA\server\main.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\S.F\Desktop\sd\MIRA\server\controllers\AuthController.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\S.F\Desktop\sd\MIRA\server\controllers\PostController.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\S.F\Desktop\sd\MIRA\server\controllers\UserController.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\S.F\Desktop\sd\MIRA\server\controllers\SocialController.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\S.F\Desktop\sd\MIRA\server\controllers\NotificationController.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\S.F\Desktop\sd\MIRA\server\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{799DE9B1-24BB-3221-A253-7DD10E0AA027}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
