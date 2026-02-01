@@ -1,24 +1,46 @@
 workflows:
-  ios-qt-workflow:
-    name: iOS Qt Build
+  ios-qt6-cmake-workflow:
+    name: Build MIRA_Client iOS
+    max_build_duration: 60
+    instance_type: mac_mini_m1 # استخدام معالج M1 يسرع بناء Qt جداً
     environment:
       groups:
-        - apple_auth # ستحتاج لربط مفاتيح آبل لاحقاً
+        - apple_auth # (اختياري) إذا كنت أضفت بيانات App Store Connect في الإعدادات
       vars:
         QT_VERSION: "6.6.0"
       xcode: latest
-      cocoapods: default
     scripts:
-      - name: Install Qt
+      - name: Install Qt6 for iOS and macOS
         script: |
           pip3 install aqtinstall
+          # نحتاج نسخة الماك كأدوات مساعدة (Host) لبناء نسخة الأيفون
+          aqt install-qt mac desktop $QT_VERSION
           aqt install-qt mac ios $QT_VERSION
-      - name: Build Project
+      - name: Configure and Build MIRA_Client
         script: |
-          export PATH=$PATH:$(pwd)/$QT_VERSION/ios/bin
+          # تحديد المسارات
+          QT_PATH=$ROOT_DIR/$QT_VERSION/ios
+          QT_HOST_PATH=$ROOT_DIR/$QT_VERSION/macos
+          
           mkdir build
           cd build
-          qmake ../your_project_name.pro # استبدل your_project_name باسم ملفك
-          make
+          
+          # إعداد CMake مع تعريف معمارية iOS ومسارات Qt6
+          cmake .. \
+            -G Xcode \
+            -DCMAKE_PREFIX_PATH=$QT_PATH \
+            -DQT_HOST_PATH=$QT_HOST_PATH \
+            -DCMAKE_SYSTEM_NAME=iOS \
+            -DCMAKE_OSX_ARCHITECTURES=arm64 \
+            -DCMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO \
+            -DCMAKE_IOS_INSTALL_COMBINED=YES
+          
+          # البدء في بناء المشروع (توليد ملف .app)
+          cmake --build . --config Release -- -sdk iphoneos
     artifacts:
-      - build/*.ipa
+      - build/Release-iphoneos/*.app
+      - build/**/*.ipa
+    publishing:
+      email:
+        recipients:
+          - elsfaei77@gmail.com # بريدك كما ظهر في الصور السابقة
