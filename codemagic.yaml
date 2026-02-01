@@ -11,23 +11,21 @@ workflows:
       - name: Install Qt6 for iOS and macOS
         script: |
           pip3 install aqtinstall
-          # تثبيت النسختين (الماك للأدوات والأيفون للمكتبات)
-          aqt install-qt mac desktop $QT_VERSION
-          aqt install-qt mac ios $QT_VERSION
+          # إضافة -m qt5compat لتحميل المكتبة الناقصة للنسختين
+          aqt install-qt mac desktop $QT_VERSION -m qt5compat
+          aqt install-qt mac ios $QT_VERSION -m qt5compat
       - name: Configure and Build MIRA_Client
         script: |
-          # 1. تحديد المسارات المطلقة التي أكدتها السجلات
+          # تحديد المسارات المطلقة
           QT_IOS="/Users/builder/clone/6.6.0/ios"
           QT_MAC="/Users/builder/clone/6.6.0/macos"
           
-          # 2. إضافة أدوات الماك للمسار (للوصول لـ moc و uic)
           export PATH=$QT_MAC/bin:$PATH
           
           cd MIRA/client
           mkdir -p build && cd build
           
-          # 3. الحل النهائي: استخدام qt-cmake مع تحديد الـ Host والـ Sysroot
-          # هذا السكريبت هو "المفتاح" لحل مشكلة GLESv2 و Core و Gui
+          # استخدام qt-cmake الرسمي مع تفعيل البحث عن المكتبات الإضافية
           $QT_IOS/bin/qt-cmake .. \
             -G Xcode \
             -DQT_HOST_PATH=$QT_MAC \
@@ -35,7 +33,7 @@ workflows:
             -DCMAKE_OSX_ARCHITECTURES=arm64 \
             -DCMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO
           
-          # 4. بناء المشروع وتوليد ملف الـ .app
+          # البناء
           cmake --build . --config Release -- -sdk iphoneos
     artifacts:
       - MIRA/client/build/Release-iphoneos/*.app
