@@ -15,25 +15,27 @@ workflows:
           aqt install-qt mac ios $QT_VERSION
       - name: Configure and Build MIRA_Client
         script: |
-          # تحديد المسارات
-          QT_PATH=$ROOT_DIR/$QT_VERSION/ios
-          QT_HOST_PATH=$ROOT_DIR/$QT_VERSION/macos
+          # 1. تحديد المسارات المطلقة لـ Qt
+          QT_IOS_DIR=$ROOT_DIR/$QT_VERSION/ios
+          QT_HOST_DIR=$ROOT_DIR/$QT_VERSION/macos
           
-          # الدخول إلى المجلد الذي يحتوي على ملف CMakeLists.txt
+          # 2. الدخول لمجلد المشروع
           cd MIRA/client
           
           mkdir -p build
           cd build
           
-          # بناء المشروع من داخل المجلد الفرعي
+          # 3. تشغيل CMake مع إضافة كل المكتبات المطلوبة (Core5Compat, etc)
           cmake .. \
             -G Xcode \
-            -DCMAKE_PREFIX_PATH=$QT_PATH \
-            -DQT_HOST_PATH=$QT_HOST_PATH \
+            -DCMAKE_PREFIX_PATH="$QT_IOS_DIR;$QT_IOS_DIR/lib/cmake" \
+            -DQt6_DIR="$QT_IOS_DIR/lib/cmake/Qt6" \
+            -DQT_HOST_PATH="$QT_HOST_DIR" \
             -DCMAKE_SYSTEM_NAME=iOS \
             -DCMAKE_OSX_ARCHITECTURES=arm64 \
             -DCMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO
           
+          # 4. البناء الفعلي باستخدام التوليد الذي قام به CMake
           cmake --build . --config Release -- -sdk iphoneos
     artifacts:
       - MIRA/client/build/Release-iphoneos/*.app
