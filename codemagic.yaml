@@ -1,0 +1,24 @@
+workflows:
+  ios-qt-workflow:
+    name: iOS Qt Build
+    environment:
+      groups:
+        - apple_auth # ستحتاج لربط مفاتيح آبل لاحقاً
+      vars:
+        QT_VERSION: "6.6.0"
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Install Qt
+        script: |
+          pip3 install aqtinstall
+          aqt install-qt mac ios $QT_VERSION
+      - name: Build Project
+        script: |
+          export PATH=$PATH:$(pwd)/$QT_VERSION/ios/bin
+          mkdir build
+          cd build
+          qmake ../your_project_name.pro # استبدل your_project_name باسم ملفك
+          make
+    artifacts:
+      - build/*.ipa
