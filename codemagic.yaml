@@ -11,40 +11,31 @@ workflows:
       - name: Install Qt6 for iOS and macOS
         script: |
           pip3 install aqtinstall
-          # تثبيت Qt
           aqt install-qt mac desktop $QT_VERSION
           aqt install-qt mac ios $QT_VERSION
       - name: Configure and Build MIRA_Client
         script: |
-          # 1. البحث عن المسار الحقيقي لـ Qt6 في كامل المجلد
-          # نستخدم mdfind أو find للوصول للمجلد الذي يحتوي على ملف الإعداد
-          QT_PATH_FOUND=$(find $HOME -name "Qt6Config.cmake" | grep "ios" | head -n 1 | sed 's|/lib/cmake/Qt6/Qt6Config.cmake||')
-          QT_HOST_FOUND=$(find $HOME -name "Qt6Config.cmake" | grep "macos" | head -n 1 | sed 's|/lib/cmake/Qt6/Qt6Config.cmake||')
+          # 1. استخدام المسارات التي أثبتت نجاحها في الخطوة السابقة
+          QT_PATH_FOUND="/Users/builder/clone/6.6.0/ios"
+          QT_HOST_FOUND="/Users/builder/clone/6.6.0/macos"
+
+          echo "Using Qt iOS Path: $QT_PATH_FOUND"
           
-          if [ -z "$QT_PATH_FOUND" ]; then
-            # محاولة أخرى في مجلد العمل الحالي إذا لم يجدها في Home
-            QT_PATH_FOUND=$(find $ROOT_DIR -name "Qt6Config.cmake" | grep "ios" | head -n 1 | sed 's|/lib/cmake/Qt6/Qt6Config.cmake||')
-            QT_HOST_FOUND=$(find $ROOT_DIR -name "Qt6Config.cmake" | grep "macos" | head -n 1 | sed 's|/lib/cmake/Qt6/Qt6Config.cmake||')
-          fi
-
-          echo "Detected Qt iOS Path: $QT_PATH_FOUND"
-          echo "Detected Qt Host Path: $QT_HOST_FOUND"
-
-          # 2. الانتقال لمجلد المشروع
           cd MIRA/client
           mkdir -p build && cd build
           
-          # 3. تنفيذ CMake باستخدام المسارات المكتشفة برمجياً
+          # 2. إضافة مسار الـ Modules لـ CMake بشكل مباشر (هذا سيحل مشكلة Core)
           cmake .. \
             -G Xcode \
-            -DCMAKE_PREFIX_PATH="$QT_PATH_FOUND" \
+            -DCMAKE_PREFIX_PATH="$QT_PATH_FOUND;$QT_PATH_FOUND/lib/cmake" \
             -DQT_HOST_PATH="$QT_HOST_FOUND" \
             -DCMAKE_SYSTEM_NAME=iOS \
             -DCMAKE_OSX_ARCHITECTURES=arm64 \
             -DQt6_DIR="$QT_PATH_FOUND/lib/cmake/Qt6" \
+            -DQt6Core_DIR="$QT_PATH_FOUND/lib/cmake/Qt6Core" \
             -DCMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO
           
-          # 4. البناء
+          # 3. البناء
           cmake --build . --config Release -- -sdk iphoneos
     artifacts:
       - MIRA/client/build/Release-iphoneos/*.app
