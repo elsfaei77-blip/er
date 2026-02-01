@@ -15,24 +15,24 @@ workflows:
           aqt install-qt mac ios $QT_VERSION
       - name: Configure and Build MIRA_Client
         script: |
-          # تحديد المسارات التي أكدها السجل السابق
-          QT_PATH_FOUND="/Users/builder/clone/6.6.0/ios"
-          QT_HOST_PATH="/Users/builder/clone/6.6.0/macos"
+          # 1. تثبيت المسارات المطلقة
+          QT_IOS="/Users/builder/clone/6.6.0/ios"
+          QT_MAC="/Users/builder/clone/6.6.0/macos"
 
           cd MIRA/client
           mkdir -p build && cd build
           
-          # الحل الذهبي: استخدام qt.toolchain.cmake
-          # هذا الملف يحل مشكلة Pcre2 و Core تلقائياً
+          # 2. تشغيل CMake مع تعيين QT_HOST_PATH كمتغير PATH صريح
+          # أضفنا :PATH لإخبار CMake أن هذا مسار مجلد حقيقي
           cmake .. \
             -G Xcode \
-            -DCMAKE_TOOLCHAIN_FILE="$QT_PATH_FOUND/lib/cmake/Qt6/qt.toolchain.cmake" \
-            -DQT_HOST_PATH="$QT_HOST_FOUND" \
+            -DCMAKE_TOOLCHAIN_FILE="$QT_IOS/lib/cmake/Qt6/qt.toolchain.cmake" \
+            -DQT_HOST_PATH:PATH="$QT_MAC" \
+            -DCMAKE_SYSTEM_NAME=iOS \
             -DCMAKE_OSX_ARCHITECTURES=arm64 \
-            -DCMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO \
-            -DCMAKE_SYSTEM_NAME=iOS
+            -DCMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO
           
-          # البناء
+          # 3. البناء
           cmake --build . --config Release -- -sdk iphoneos
     artifacts:
       - MIRA/client/build/Release-iphoneos/*.app
