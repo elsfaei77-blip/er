@@ -11,31 +11,36 @@ workflows:
       - name: Install Qt6 for iOS and macOS
         script: |
           pip3 install aqtinstall
+          # تثبيت نسخة الماك (للأدوات) ونسخة الأيفون (للمكتبات)
           aqt install-qt mac desktop $QT_VERSION
           aqt install-qt mac ios $QT_VERSION
       - name: Configure and Build MIRA_Client
         script: |
-          # تحديد المسارات بناءً على هيكلية aqtinstall المعروفة
-          export QT_ROOT=$ROOT_DIR/6.6.0
-          export QT_IOS_DIR=$QT_ROOT/ios
-          export QT_HOST_DIR=$QT_ROOT/macos
+          # 1. تحديد المسارات المطلقة لضمان العثور على Qt
+          QT_PREFIX=$ROOT_DIR/6.6.0/ios
+          QT_HOST_PREFIX=$ROOT_DIR/6.6.0/macos
           
-          # الدخول للمجلد الذي يحتوي على CMakeLists.txt
+          # 2. إضافة مسارات Qt إلى بيئة النظام (مهم جداً لـ CMake)
+          export PATH=$QT_HOST_PREFIX/bin:$QT_PREFIX/bin:$PATH
+          
+          # 3. الدخول لمجلد المشروع الحقيقي
           cd MIRA/client
           
-          mkdir -p build && cd build
+          # 4. تنظيف أي محاولات بناء سابقة وإنشاء مجلد جديد
+          rm -rf build
+          mkdir build && cd build
           
-          # تشغيل CMake مع المسارات الصحيحة
+          # 5. أمر CMake الذهبي (يجمع بين مسار المكتبات ومسار الأدوات)
           cmake .. \
             -G Xcode \
-            -DCMAKE_PREFIX_PATH=$QT_IOS_DIR \
-            -DQT_HOST_PATH=$QT_HOST_DIR \
+            -DCMAKE_PREFIX_PATH=$QT_PREFIX \
+            -DQT_HOST_PATH=$QT_HOST_PREFIX \
             -DCMAKE_SYSTEM_NAME=iOS \
             -DCMAKE_OSX_ARCHITECTURES=arm64 \
-            -DQt6_DIR=$QT_IOS_DIR/lib/cmake/Qt6 \
-            -DCMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO
+            -DCMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO \
+            -DQt6_DIR=$QT_PREFIX/lib/cmake/Qt6
           
-          # البناء النهائي
+          # 6. البناء الفعلي وتوليد ملف التطبيق
           cmake --build . --config Release -- -sdk iphoneos
     artifacts:
       - MIRA/client/build/Release-iphoneos/*.app
