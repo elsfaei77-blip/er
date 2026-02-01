@@ -15,24 +15,25 @@ workflows:
           aqt install-qt mac ios $QT_VERSION
       - name: Configure and Build MIRA_Client
         script: |
-          # 1. تثبيت المسارات المطلقة
+          # 1. تحديد المسارات المطلقة التي حصلنا عليها من السجل السابق
           QT_IOS="/Users/builder/clone/6.6.0/ios"
           QT_MAC="/Users/builder/clone/6.6.0/macos"
-
+          
+          # 2. إضافة أدوات Qt للمسار العام
+          export PATH=$QT_MAC/bin:$QT_IOS/bin:$PATH
+          
           cd MIRA/client
           mkdir -p build && cd build
           
-          # 2. تشغيل CMake مع تعيين QT_HOST_PATH كمتغير PATH صريح
-          # أضفنا :PATH لإخبار CMake أن هذا مسار مجلد حقيقي
-          cmake .. \
+          # 3. استخدام سكريبت qt-cmake الرسمي (هذا هو الحل السحري لمشكلة GLESv2)
+          # هذا السكريبت يضبط كل التبعيات تلقائياً
+          $QT_IOS/bin/qt-cmake .. \
             -G Xcode \
-            -DCMAKE_TOOLCHAIN_FILE="$QT_IOS/lib/cmake/Qt6/qt.toolchain.cmake" \
-            -DQT_HOST_PATH:PATH="$QT_MAC" \
-            -DCMAKE_SYSTEM_NAME=iOS \
+            -DQT_HOST_PATH=$QT_MAC \
             -DCMAKE_OSX_ARCHITECTURES=arm64 \
             -DCMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO
           
-          # 3. البناء
+          # 4. البناء الفعلي
           cmake --build . --config Release -- -sdk iphoneos
     artifacts:
       - MIRA/client/build/Release-iphoneos/*.app
