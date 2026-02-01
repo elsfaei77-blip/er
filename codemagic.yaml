@@ -12,30 +12,34 @@ workflows:
       - name: Install Qt6 with all required modules
         script: |
           pip3 install aqtinstall
-          # المسميات الصحيحة للموديولات في aqt هي qt5compat و qtshadertools
           aqt install-qt mac desktop $QT_VERSION -m qt5compat qtshadertools
           aqt install-qt mac ios $QT_VERSION -m qt5compat qtshadertools
       - name: Configure and Build MIRA_Client
         script: |
           QT_IOS="/Users/builder/clone/6.6.0/ios"
           QT_MAC="/Users/builder/clone/6.6.0/macos"
-          
           export PATH=$QT_MAC/bin:$PATH
           
           cd MIRA/client
           mkdir -p build && cd build
           
-          # استخدام qt-cmake مع تمرير المتغيرات المطلوبة
+          # إضافة خيار تعطيل التوقيع لـ CMake
           $QT_IOS/bin/qt-cmake .. \
             -G Xcode \
             -DQT_HOST_PATH=$QT_MAC \
             -DCMAKE_OSX_SYSROOT=iphoneos \
             -DCMAKE_OSX_ARCHITECTURES=arm64 \
             -DXCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER=$BUNDLE_ID \
+            -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO \
+            -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED=NO \
             -DCMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO
           
-          # البناء النهائي
-          cmake --build . --config Release -- -sdk iphoneos
+          # البناء مع إخبار Xcode بتجاهل التوقيع والبحث عن فريق
+          cmake --build . --config Release -- -sdk iphoneos \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_ENTITLEMENTS=""
     artifacts:
       - MIRA/client/build/Release-iphoneos/*.app
       - MIRA/client/build/**/*.ipa
